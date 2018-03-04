@@ -4,9 +4,15 @@ import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 
+// components
 import { MyApp } from './app.component';
+
+// services 
 import { DataProvider } from '../providers/data/data';
 
+// plugins and others
+import { File } from '@ionic-native/file';
+import { FileChooser } from '@ionic-native/file-chooser';
 import { InAppBrowser } from '@ionic-native/in-app-browser';
 
 import { AngularFireModule } from 'angularfire2';
@@ -40,9 +46,11 @@ var firebaseConfig = {
   providers: [
     StatusBar,
     SplashScreen,
-    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    FileChooser,
+    File,
     DataProvider, 
-    InAppBrowser
+    InAppBrowser,
+    {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })
 export class AppModule {}

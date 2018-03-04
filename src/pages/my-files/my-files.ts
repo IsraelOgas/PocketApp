@@ -3,8 +3,9 @@ import { IonicPage, NavController, AlertController, ToastController } from 'ioni
 import { DataProvider } from '../../providers/data/data';
 import { Observable } from 'rxjs/Observable';
 import { InAppBrowser } from '@ionic-native/in-app-browser';
-
-
+import { File } from '@ionic-native/file';
+import { FileChooser } from '@ionic-native/file-chooser';
+import firebase from 'firebase';
 
 @IonicPage()
 @Component({
@@ -15,7 +16,15 @@ export class MyFilesPage {
 
   files: Observable<any[]>;
 
-  constructor(public navCtrl: NavController, private dataProvider: DataProvider, private alertCtrl: AlertController, private toastCtrl: ToastController, private iab: InAppBrowser) {
+  constructor(
+    public navCtrl: NavController,
+    private dataProvider: DataProvider,
+    private alertCtrl: AlertController,
+    private toastCtrl: ToastController,
+    private iab: InAppBrowser,
+    private fileChooser: FileChooser,
+    private file: File
+  ) {
     this.files = this.dataProvider.getFiles();
   }
 
@@ -46,7 +55,6 @@ export class MyFilesPage {
 
   uploadInformation(text) {
     let upload = this.dataProvider.uploadToStorage(text);
-    console.log(upload);
 
     upload.then().then(res => {
       console.log('res: ', res);
@@ -72,5 +80,36 @@ export class MyFilesPage {
 
   viewFile(url) {
     this.iab.create(url);
+  }
+
+  chooseFile() {
+    this.fileChooser.open().then((uri) => {
+      alert(uri);
+
+      this.file.resolveLocalFilesystemUrl(uri).then((newUrl) => {
+        alert(JSON.stringify(newUrl));
+
+        let dirPath = newUrl.nativeURL;
+        let dirPathSegments = dirPath.split('/')
+        dirPathSegments.pop()
+        dirPath = dirPathSegments.join('/')
+
+        this.file.readAsArrayBuffer(dirPath, newUrl.name).then( async (buffer) => {
+          await this.uploadFile(buffer, newUrl.name);
+        });
+
+      })
+    })
+  }
+
+  async uploadFile(buffer, name) {
+    let blob = new Blob([buffer], { type: "images/jpeg" })
+    let storage = firebase.storage();
+
+    storage.ref().put(blob).then((d) => {
+      alert('Done');
+    }).catch((err) => {
+      alert(JSON.stringify(err));
+    })
   }
 }

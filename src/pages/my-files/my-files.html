@@ -8,7 +8,6 @@
 
 
 <ion-content>
-
   <ion-card *ngFor="let file of files | async">
     <ion-card-header>
       {{ file.created | date: 'medium' }}
@@ -32,3 +31,9 @@
     </button>
   </ion-fab>
 </ion-content>
+
+<!-- <ion-content>
+  <button ion-button block (click)="chooseFile()">
+    <ion-icon name="md-add-circle"></ion-icon>
+  </button>
+</ion-content> -->
